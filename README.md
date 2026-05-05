@@ -7,20 +7,36 @@ The app reads lines from stdin one at a time and, after each line, prints the to
 
 ## Environment
 
-For convenience, we choose the oldest Java SE LTS that is available through SDKMAN.
+For convenience, we choose the oldest Java SE LTS that is available through [SDKMAN](https://sdkman.io/).
 
 ```bash
+❯ sdk install java 8.0.492-zulu
+❯ export JAVA_HOME=/Users/laufer/.sdkman/candidates/java/8.0.492-zulu
 ❯ $JAVA_HOME/bin/java -version
 openjdk version "1.8.0_492"
 OpenJDK Runtime Environment (Zulu 8.94.0.17-CA-macos-aarch64) (build 1.8.0_492-b09)
 OpenJDK 64-Bit Server VM (Zulu 8.94.0.17-CA-macos-aarch64) (build 25.492-b09, mixed mode)
 ```
 
+
 ## Building
 
 ```bash
 ❯ $JAVA_HOME/bin/javac CumLineLength.java
 ```
+
+
+# Testing
+
+```bash
+❯ ./test.sh
+PASS: empty input
+PASS: single line
+PASS: multiple lines
+
+Results: 3 passed, 0 failed
+```
+
 
 ## Interactive use
 
