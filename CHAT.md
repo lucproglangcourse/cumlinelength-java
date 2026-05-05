@@ -222,3 +222,37 @@ cat nonexistent_file | grep foo   # exits 0 — cat failed but grep "succeeded"
 With `pipefail`, it exits non-zero because `cat` failed.
 
 In this script it matters for the final line `[[ $FAIL -eq 0 ]]` — if somehow a pipe were used to feed input to the program and the feeder failed silently, `pipefail` would catch it. In practice here the more important setting is `set -e`, which exits the script immediately on any non-zero exit code.
+
+User: Add GitHub action CI workflow based on this test script and the predefined java setup action (Java 8).
+
+GitHub Copilot: Created [](file:///Users/laufer/Work/teaching/cs371/cumlinelength-java/.github/workflows/ci.yml)
+
+The workflow triggers on every push and pull request, sets up Temurin JDK 8 (the most common free distribution for `actions/setup-java`), compiles, then runs the test script. `JAVA_HOME` is set automatically by `actions/setup-java`, so test.sh will pick it up correctly.
+
+Made changes.
+
+User: How can we test the interactive behavior, i.e., the app responding directly to each input line, which makes it usable on infinite input streams? If this is doable, put it in a separate script.
+
+GitHub Copilot: The key property to test is that the app flushes output **immediately after each input line**, rather than buffering. A timeout-based test using a coprocess does this: send one line, wait for a response within a time limit — if output were buffered, the read would time out and fail.
+
+`Java`'s `PrintStream` (`System.out`) has auto-flush enabled, so `println` always flushes regardless of whether stdout is a terminal or a pipe. This test verifies that invariant holds. 
+
+Created [](file:///Users/laufer/Work/teaching/cs371/cumlinelength-java/test_interactive.sh)
+
+Ran terminal command:  bash test_interactive.sh
+Completed with input:  bash test_interactive.sh
+
+macOS ships bash 3.2. The system `bash` is too old but the CI (ubuntu) will have bash 5. Let's verify it works there by also checking if a newer bash is available locally: 
+
+Ran terminal command:  which -a bash && /opt/homebrew/bin/bash --version 2>/dev/null | head -1 || echo "no homebrew bash"
+
+Ran terminal command:  brew list bash 2>/dev/null && brew --prefix bash 2>/dev/null || echo "bash not installed via homebrew"
+
+No Homebrew bash available locally. The script will work correctly on the CI (ubuntu, bash 5). For local use on macOS, the version check gives a clear error message rather than a cryptic failure. No changes needed — this is the right design.
+
+The script works as follows:
+- `coproc PROC { ... }` starts the app with pipes wired to `${PROC[0]}` (its stdout) and `${PROC[1]}` (its stdin)
+- Each `check` writes one line to the app's stdin, then calls `read -t 5` on the app's stdout — if the response doesn't arrive within 5 seconds, the app is buffering and the test fails
+- `exec {PROC[1]}>&-` closes the write end of the pipe, signalling EOF to the app
+
+Made changes.

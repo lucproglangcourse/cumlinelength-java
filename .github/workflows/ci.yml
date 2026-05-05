@@ -21,3 +21,6 @@ jobs:
 
       - name: Test
         run: bash test.sh
+
+      - name: Test interactive behavior
+        run: bash test_interactive.sh
