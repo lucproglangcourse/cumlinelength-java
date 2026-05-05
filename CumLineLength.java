@@ -12,7 +12,7 @@ public class CumLineLength {
                 cumulative += line.length();
                 System.out.println(cumulative);
                 // handle the case where downstream closed its end of the pipe
-                if (System.out.checkError()) System.exit(1);
+                if (System.out.checkError()) break;
             }
         }
     }
