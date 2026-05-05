@@ -107,6 +107,9 @@ To fix this behavior, we check whether `System.out` has encountered any write er
 if (System.out.checkError()) break;
 ```
 
+We use `break` rather than `System.exit(1)` because a downstream process consuming only part of our output (e.g. `head`) is normal, not an error.
+Exiting with a non-zero status would signal failure to the shell and break scripts that check exit codes.
+
 Now the application behaves as required.
 
 ```bash
