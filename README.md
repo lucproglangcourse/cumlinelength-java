@@ -88,7 +88,7 @@ Our app works as part of a UNIX pipeline for finite input:
 ```
 
 If the input is infinite, the output of our app is also infinite. 
-In a typical UNIX pipeline, we select a finite prefix downstream of the infinite output.
+In a typical UNIX pipeline, we select a *finite prefix* downstream of the infinite output.
 
 ```bash
 ❯ yes | $JAVA_HOME/bin/java CumLineLength | head
@@ -123,7 +123,7 @@ To fix this behavior, we check whether `System.out` has encountered any write er
 if (System.out.checkError()) break;
 ```
 
-We use `break` rather than `System.exit(1)` because a downstream process consuming only part of our output (e.g. `head`) is normal, not an error.
+We use `break` rather than `System.exit(1)` because a downstream process consuming only a finite prefix of our output (e.g. `head`) is normal, not an error.
 Exiting with a non-zero status would signal failure to the shell and break scripts that check exit codes.
 
 Now the application behaves as required.
