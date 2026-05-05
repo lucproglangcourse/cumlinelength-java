@@ -16,6 +16,12 @@ OpenJDK Runtime Environment (Zulu 8.94.0.17-CA-macos-aarch64) (build 1.8.0_492-b
 OpenJDK 64-Bit Server VM (Zulu 8.94.0.17-CA-macos-aarch64) (build 25.492-b09, mixed mode)
 ```
 
+## Building
+
+```bash
+❯ $JAVA_HOME/bin/javac CumLineLength.java
+```
+
 ## Interactive use
 
 In interactive use with finite input, our app behaves as required.
@@ -23,7 +29,7 @@ We test with inputs of length zero, one, and several lines.
 
 ```bash
 ❯ $JAVA_HOME/bin/java CumLineLength
-EOF
+^D
 ```
 
 ```bash
@@ -42,16 +48,15 @@ what
 14
 up
 16
-EOF
+^D
 ```
 
 
-## Initial problem when used in a UNIX pipeline
+## Initial problem: hanging when downstream truncates output
 
 Our app works as part of a UNIX pipeline for finite input:
 
 ```bash
-❯ $JAVA_HOME/bin/javac CumLineLength.java
 ❯ yes | head | $JAVA_HOME/bin/java CumLineLength
 1
 2
@@ -81,11 +86,10 @@ In a typical UNIX pipeline, we select a finite prefix downstream of the infinite
 8
 9
 10
-[hangs]
 ```
 
-The initial solution, however, hangs in this scenario, and its JVM process continues running with high CPU utilization.
-The reason is Java's default behavior of ignoring the IO error that occurs when the downstream process closes its input stream and our app can no longer write to it.
+The initial solution, however, hangs: the prompt does not return, and the JVM process continues running with high CPU utilization.
+The reason is Java's default behavior of ignoring the I/O error that occurs when the downstream process exits, closing its end of the pipe, so our app can no longer write to it.
 
 
 ## What not to do: trap `SIGPIPE`
@@ -97,7 +101,7 @@ Instead, detect the failed write directly via Java output APIs.
 
 ## Robust handling of downstream truncation
 
-To fix this behavior, we need to check programmatically whether the most recent attempt to write to the input of the downstream process was successful.
+To fix this behavior, we check whether `System.out` has encountered any write error — for example, a broken pipe caused by the downstream process exiting.
 
 ```java
 if (System.out.checkError()) break;
