@@ -2,7 +2,7 @@
 
 Minimal example of a pipe-friendly Java command-line app.
 
-Our app reads line by line from stdin until EOF. For each successive line it reads, it immediately responds with an updated cumulative char count.
+The app reads lines from stdin one at a time and, after each line, prints the total number of characters read so far. It stops when it reaches EOF (end of input).
 
 
 ## Environment
