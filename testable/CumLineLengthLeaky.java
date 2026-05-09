@@ -20,11 +20,12 @@ record CumLineLengthLogic(Iterator<String> lines) {
 
 /** Read lines from standard input and accumulate their lengths. */
 public class CumLineLengthLeaky {
-    public static void main(String[] args) {
+    public static void main(final String[] args) {
         // try-with-resources ensures scanner.close() is called on all exit paths
-        try (var scanner = new Scanner(System.in)) {
+        try (final var input = new Scanner(System.in).useDelimiter("\\n")) {
             // delegate to pure functional core and print results
-            for (final var value : new CumLineLengthLogic(scanner.useDelimiter("\\n")).process()) {
+            final var result = new CumLineLengthLogic(input).process();
+            for (final var value : result) {
                 System.out.println(value);
                 // handle the case where downstream closed its end of the pipe
                 if (System.out.checkError()) break;
