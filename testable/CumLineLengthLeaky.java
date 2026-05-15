@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Scanner;
 
 /** Pure core logic: accumulates line lengths with no I/O dependency. */
-record CumLineLengthLogic(Iterator<String> lines) {
+record CumLineLengthLeakyLogic(Iterator<String> lines) {
 
     /** Processes the input and returns the cumulative lengths as an inspectable list. */
     public List<Long> process() {
@@ -24,7 +24,7 @@ public class CumLineLengthLeaky {
         // try-with-resources ensures scanner.close() is called on all exit paths
         try (final var input = new Scanner(System.in).useDelimiter("\\n")) {
             // delegate to pure functional core and print results
-            final var result = new CumLineLengthLogic(input).process();
+            final var result = new CumLineLengthLeakyLogic(input).process();
             for (final var value : result) {
                 System.out.println(value);
                 // handle the case where downstream closed its end of the pipe
